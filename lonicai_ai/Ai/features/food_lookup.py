@@ -1,14 +1,11 @@
 import os
-import requests
 
-from food_map import FOOD_MAP
-import os
 import requests
 from dotenv import load_dotenv
 
-from food_map import FOOD_MAP
 
 load_dotenv()
+
 
 # ==========================================
 # USDA API
@@ -23,12 +20,15 @@ USDA_API_URL = (
 # LOOKUP
 # ==========================================
 
-def lookup_food(prediction):
+def lookup_food(prediction: str):
 
-    search = FOOD_MAP.get(
-        prediction.lower(),
-        prediction.lower(),
-    )
+    if not prediction:
+        raise ValueError(
+            "No food prediction was provided."
+        )
+
+    # Use the CLIP prediction directly.
+    search = prediction.strip().lower()
 
     api_key = os.getenv("USDA_API_KEY")
 
@@ -36,6 +36,10 @@ def lookup_food(prediction):
         raise RuntimeError(
             "USDA_API_KEY environment variable is not set."
         )
+
+    # ======================================
+    # USDA REQUEST
+    # ======================================
 
     try:
 
@@ -57,13 +61,27 @@ def lookup_food(prediction):
             f"USDA API request failed: {e}"
         )
 
-    data = response.json()
+    # ======================================
+    # RESPONSE
+    # ======================================
+
+    try:
+
+        data = response.json()
+
+    except ValueError as e:
+
+        raise RuntimeError(
+            f"USDA returned invalid JSON: {e}"
+        )
 
     foods = data.get("foods", [])
 
     if not foods:
 
-        print("\nNo USDA match found.")
+        print(
+            f"\nNo USDA match found for: {prediction}"
+        )
 
         return None
 
@@ -124,7 +142,7 @@ def lookup_food(prediction):
         }
 
     # ======================================
-    # PRINT
+    # PRINT NUTRITION
     # ======================================
 
     print("\n==============================")
@@ -143,15 +161,16 @@ def lookup_food(prediction):
 
     for item in order:
 
-        if item in nutrition:
+        if item not in nutrition:
+            continue
 
-            value = nutrition[item]
+        value = nutrition[item]
 
-            print(
-                f"{item:<15}"
-                f"{value['amount']:.2f} "
-                f"{value['unit']}"
-            )
+        print(
+            f"{item:<15}"
+            f"{value['amount']:.2f} "
+            f"{value['unit']}"
+        )
 
     # ======================================
     # RETURN
