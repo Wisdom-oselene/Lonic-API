@@ -5,7 +5,7 @@ import tempfile
 import os
 from pathlib import Path
 
-from predict import analyze_image
+from .predict import analyze_image
 from features.feedback import save_feedback
 from features.retrain import retrain
 from features.favorites import (
