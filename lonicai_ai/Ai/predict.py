@@ -1,6 +1,7 @@
 from .features.clip_model import predict
-from .features.memory_search import search_memory
 from .features.food_lookup import lookup_food
+from .features.memory_search import search_memory
+
 
 
 def analyze_image(image_path: str):
