@@ -6,15 +6,14 @@ import os
 from pathlib import Path
 
 from .predict import analyze_image
-from features.feedback import save_feedback
-from features.retrain import retrain
-from features.favorites import (
+from .features.feedback import save_feedback
+from .features.retrain import retrain
+from .features.favorites import (
     get_favorites,
     add_favorite,
     remove_favorite,
     is_favorite,
 )
-
 
 
 app = FastAPI(
